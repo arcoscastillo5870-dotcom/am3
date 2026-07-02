@@ -1,0 +1,868 @@
+:Simulador de Amortización Premium Negro y Beige:amortizacion_negro_beige.html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcuAmortiza Elite - Simulador Financiero</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- KaTeX para renderizado matemático elegante de LaTeX -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" onload="renderMathInElement(document.body);"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        luxury: {
+                            black: '#0A0A0A',      /* Negro Absoluto */
+                            charcoal: '#171717',   /* Carbón de contraste */
+                            darkBeige: '#8C7A5B',  /* Beige Dorado Oscuro */
+                            beige: '#C5B494',      /* Beige Intermedio */
+                            lightBeige: '#EFECE6', /* Crema / Beige Claro */
+                            cream: '#FAF9F6'       /* Fondo Off-White */
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #FAF9F6;
+        }
+        
+        .serif-title {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Estilo personalizado del Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FAF9F6;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #C5B494;
+            border-radius: 9px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #8C7A5B;
+        }
+    </style>
+</head>
+<body class="text-luxury-black antialiased selection:bg-luxury-lightBeige selection:text-luxury-black min-h-screen flex flex-col">
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 ease-out bg-luxury-black text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-luxury-darkBeige/30 pointer-events-none">
+        <div class="p-1 bg-luxury-darkBeige/20 rounded text-luxury-beige">
+            <i data-lucide="gold" class="w-4 h-4"></i>
+        </div>
+        <span id="toast-message" class="text-xs font-semibold tracking-wide">Cálculo ejecutado con éxito</span>
+    </div>
+
+    <!-- NAVBAR PREMIUM -->
+    <header class="bg-luxury-black text-white border-b border-luxury-darkBeige/20 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-luxury-charcoal border border-luxury-darkBeige/30 rounded-xl text-luxury-beige">
+                    <i data-lucide="coins" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <span class="serif-title font-bold text-xl tracking-widest text-luxury-cream">ECUAMORTIZA</span>
+                    <span class="block text-[9px] text-luxury-beige font-extrabold tracking-[0.25em] uppercase">Sistemas de Crédito Élite</span>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex items-center gap-8 text-xs font-bold uppercase tracking-widest text-luxury-lightBeige/75">
+                <a href="#calculadora" class="hover:text-luxury-beige transition-colors">Calculadora</a>
+                <a href="#comparador" class="hover:text-luxury-beige transition-colors">Comparador de Sistemas</a>
+                <a href="#teoria" class="hover:text-luxury-beige transition-colors">Marco de Fórmulas</a>
+            </nav>
+
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1.5 bg-luxury-charcoal text-luxury-beige text-[10px] font-black tracking-widest uppercase rounded-lg border border-luxury-darkBeige/30">
+                    Ecuador IVA 15%
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="bg-luxury-black text-white py-16 px-4 sm:px-6 lg:px-8 border-b border-luxury-darkBeige/20 relative overflow-hidden">
+        <!-- Textura abstracta sutil de fondo -->
+        <div class="absolute inset-0 opacity-5 bg-[radial-gradient(#C5B494_1px,transparent_1px)] [background-size:24px_24px]"></div>
+        
+        <div class="max-w-7xl mx-auto relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+            <div class="lg:col-span-8 space-y-4">
+                <span class="text-xs font-bold uppercase tracking-[0.3em] text-luxury-beige">Plataforma Financiera Avanzada</span>
+                <h1 class="serif-title text-4xl sm:text-6xl font-light tracking-wider leading-tight text-luxury-cream">
+                    Ingeniería de <span class="font-bold text-luxury-beige">Amortización</span>
+                </h1>
+                <p class="text-luxury-lightBeige/70 max-w-2xl text-sm sm:text-base leading-relaxed">
+                    Un simulador corporativo de alta gama que unifica las normativas financieras del Ecuador. Procesa tasas nominales y compuestas, calcula el impuesto al valor agregado (IVA) sobre el interés devengado, y genera proyecciones matemáticas en sistemas Francés, Alemán y Americano.
+                </p>
+            </div>
+            <div class="lg:col-span-4 flex justify-end">
+                <div class="border border-luxury-darkBeige/30 bg-luxury-charcoal p-6 rounded-2xl max-w-sm w-full space-y-4">
+                    <div class="flex items-center gap-2 text-luxury-beige">
+                        <i data-lucide="scale" class="w-5 h-5"></i>
+                        <h3 class="font-serif font-bold text-sm tracking-widest uppercase">Estatuto de Ecuador</h3>
+                    </div>
+                    <p class="text-[11px] text-luxury-lightBeige/60 leading-relaxed">
+                        De acuerdo con el Servicio de Rentas Internas (SRI), los intereses generados por créditos de consumo no productivo están sujetos al cobro del **IVA (15%)**. Nuestro algoritmo calcula este impuesto mes a mes sobre el interés devengado.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN INTERACTIVE WORKSPACE -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex-grow w-full">
+        
+        <div id="calculadora" class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+            
+            <!-- CONTROLES DEL CALCULADOR (COL: 4) -->
+            <div class="lg:col-span-4 space-y-6">
+                <div class="bg-white border border-luxury-beige/40 rounded-2xl p-6 shadow-xs">
+                    <h2 class="serif-title text-sm font-bold tracking-widest text-luxury-black uppercase flex items-center gap-2 mb-6 border-b border-luxury-lightBeige pb-4">
+                        <i data-lucide="sliders-horizontal" class="text-luxury-darkBeige w-4 h-4"></i>
+                        Parámetros de Entrada
+                    </h2>
+
+                    <form id="simulator-form" onsubmit="event.preventDefault(); triggerCalculation();" class="space-y-6">
+                        
+                        <!-- MONTO (CAPITAL) -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-luxury-darkBeige mb-2 flex justify-between">
+                                Monto del Préstamo (USD)
+                                <span class="text-luxury-black font-extrabold" id="live-monto-label">$10,000.00</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-luxury-darkBeige text-sm font-semibold">$</span>
+                                <input type="number" id="capital" value="10000" min="100" max="10000000" step="100"
+                                       class="w-full pl-8 pr-4 py-2.5 bg-luxury-cream border border-luxury-beige/50 rounded-xl focus:ring-2 focus:ring-luxury-darkBeige/20 focus:border-luxury-darkBeige focus:bg-white outline-none transition-all font-semibold text-sm text-luxury-black" required>
+                            </div>
+                        </div>
+
+                        <!-- TASA DE INTERÉS -->
+                        <div class="bg-luxury-cream p-4 rounded-xl border border-luxury-beige/30 space-y-4">
+                            <div class="flex justify-between items-center">
+                                <label class="text-[10px] font-bold uppercase tracking-widest text-luxury-darkBeige">Tasa de Interés</label>
+                                <div class="flex bg-neutral-200 p-0.5 rounded-lg text-[9px] font-bold">
+                                    <button type="button" id="toggle-tasa-anual" class="px-2 py-1 rounded bg-white text-luxury-black shadow-xs transition-all" onclick="updateTasaMode('anual')">Anual</button>
+                                    <button type="button" id="toggle-tasa-mensual" class="px-2 py-1 text-neutral-500 transition-all" onclick="updateTasaMode('mensual')">Mensual</button>
+                                </div>
+                            </div>
+
+                            <div class="relative">
+                                <input type="number" id="tasa-entrada" value="12.5" min="0.01" max="100" step="0.01"
+                                       class="w-full pr-12 pl-4 py-2 bg-white border border-luxury-beige/50 rounded-lg focus:ring-2 focus:ring-luxury-darkBeige/20 focus:border-luxury-darkBeige outline-none font-bold text-sm text-luxury-black">
+                                <span id="tasa-suffix" class="absolute inset-y-0 right-0 pr-3 flex items-center text-luxury-darkBeige text-[10px] font-extrabold uppercase">% Anual</span>
+                            </div>
+
+                            <!-- INTERÉS COMPUESTO CONVERSIÓN -->
+                            <div class="pt-3 border-t border-luxury-beige/20">
+                                <label class="flex items-center justify-between text-[11px] text-luxury-darkBeige cursor-pointer select-none">
+                                    <span class="flex items-center gap-1.5 font-bold">
+                                        <i data-lucide="help-circle" class="w-3.5 h-3.5 text-luxury-beige" title="El interés compuesto realiza conversiones exponenciales (TEA <-> TEM), mientras que el interés simple realiza conversiones dividiendo o multiplicando por 12."></i>
+                                        ¿Aplicar Interés Compuesto?
+                                    </span>
+                                    <input type="checkbox" id="interes-compuesto-chk" class="rounded border-luxury-beige/60 text-luxury-darkBeige focus:ring-luxury-darkBeige h-4 w-4" checked onchange="updateRatesDisplays()">
+                                </label>
+                                
+                                <div class="mt-2.5 text-[9px] text-neutral-500 font-mono bg-white p-2.5 rounded-lg border border-luxury-beige/20 space-y-1">
+                                    <div class="flex justify-between">
+                                        <span>Tasa Efectiva Anual (TEA):</span>
+                                        <span id="display-tea" class="font-bold text-luxury-black">12.5000%</span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Tasa Efectiva Mensual (TEM):</span>
+                                        <span id="display-tem" class="font-bold text-luxury-black">0.9864%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- PLAZO -->
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-luxury-darkBeige mb-1.5">Plazo</label>
+                                <input type="number" id="plazo" value="12" min="1" max="360"
+                                       class="w-full px-3.5 py-2.5 bg-luxury-cream border border-luxury-beige/50 rounded-xl focus:ring-2 focus:ring-luxury-darkBeige/20 focus:bg-white outline-none font-bold text-sm text-luxury-black" required>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-widest text-luxury-darkBeige mb-1.5">Unidad</label>
+                                <select id="plazo-unidad" class="w-full px-3.5 py-2.5 bg-luxury-cream border border-luxury-beige/50 rounded-xl focus:ring-2 focus:ring-luxury-darkBeige/20 focus:bg-white outline-none font-bold text-xs text-luxury-black">
+                                    <option value="meses" selected>Meses</option>
+                                    <option value="anios">Años</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- SISTEMA DE AMORTIZACIÓN -->
+                        <div>
+                            <label class="block text-[10px] font-bold uppercase tracking-widest text-luxury-darkBeige mb-2">Sistema de Amortización</label>
+                            <select id="sistema-tipo" class="w-full px-3.5 py-2.5 bg-luxury-cream border border-luxury-beige/50 rounded-xl focus:ring-2 focus:ring-luxury-darkBeige/20 focus:bg-white outline-none font-bold text-xs text-luxury-black">
+                                <option value="francesa">Francés (Cuota Fija / Amortización Progresiva)</option>
+                                <option value="alemana">Alemán (Amortización de Capital Fijo)</option>
+                                <option value="americana">Americano (Abono de Capital al Vencimiento)</option>
+                            </select>
+                        </div>
+
+                        <!-- TRIBUTACIÓN (IVA DE ECUADOR) -->
+                        <div class="bg-luxury-cream p-4 rounded-xl border border-luxury-beige/30">
+                            <div class="flex justify-between items-center mb-1.5">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-luxury-darkBeige flex items-center gap-1">
+                                    Impuesto IVA Ecuador
+                                    <i data-lucide="info" class="w-3.5 h-3.5 text-luxury-beige" title="El IVA de Ecuador se aplica únicamente sobre los intereses calculados en cada periodo de pago."></i>
+                                </span>
+                                <span id="iva-porcentaje-lbl" class="text-[10px] font-bold text-luxury-black bg-white border border-luxury-beige/30 px-2 py-0.5 rounded">15%</span>
+                            </div>
+                            <input type="range" id="iva-rango" min="0" max="25" value="15" class="w-full accent-luxury-darkBeige h-1 bg-neutral-200 rounded-lg cursor-pointer" oninput="document.getElementById('iva-porcentaje-lbl').innerText = this.value + '%';">
+                        </div>
+
+                        <!-- ACCIÓN -->
+                        <button type="submit" class="w-full bg-luxury-black hover:bg-luxury-charcoal text-white font-bold py-3.5 px-4 rounded-xl transition-all shadow-lg border border-luxury-darkBeige/40 flex items-center justify-center gap-2 text-xs uppercase tracking-widest">
+                            <i data-lucide="calculator" class="w-4 h-4 text-luxury-beige"></i>
+                            Calcular Tabla de Pagos
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- DASHBOARD DE RESULTADOS (COL: 8) -->
+            <div class="lg:col-span-8 space-y-8">
+                
+                <!-- KPI PANEL -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-luxury-beige/30 shadow-xs">
+                        <span class="text-[9px] font-extrabold text-luxury-darkBeige uppercase tracking-[0.15em] block">Primera Cuota</span>
+                        <div class="mt-1">
+                            <span id="kpi-primera-cuota" class="text-lg font-black text-luxury-black truncate block">$0.00</span>
+                            <span class="text-[9px] text-neutral-400 block mt-0.5">Con impuestos</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-luxury-beige/30 shadow-xs">
+                        <span class="text-[9px] font-extrabold text-luxury-darkBeige uppercase tracking-[0.15em] block">Total Intereses</span>
+                        <div class="mt-1">
+                            <span id="kpi-total-interes" class="text-lg font-black text-luxury-black truncate block">$0.00</span>
+                            <span class="text-[9px] text-neutral-400 block mt-0.5">Carga financiera bruta</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-luxury-beige/30 shadow-xs">
+                        <span class="text-[9px] font-extrabold text-luxury-darkBeige uppercase tracking-[0.15em] block">IVA Acumulado</span>
+                        <div class="mt-1">
+                            <span id="kpi-total-iva" class="text-lg font-black text-luxury-darkBeige truncate block">$0.00</span>
+                            <span class="text-[9px] text-neutral-400 block mt-0.5">Impuesto SRI (15%)</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-luxury-beige/30 shadow-xs">
+                        <span class="text-[9px] font-extrabold text-luxury-darkBeige uppercase tracking-[0.15em] block">Total a Pagar</span>
+                        <div class="mt-1">
+                            <span id="kpi-total-pagado" class="text-lg font-black text-luxury-black truncate block">$0.00</span>
+                            <span class="text-[9px] text-neutral-400 block mt-0.5">Suma total integrada</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO DE ANÁLISIS DE CUOTAS -->
+                <div class="bg-white p-6 rounded-2xl border border-luxury-beige/30 shadow-xs">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+                        <div>
+                            <h3 class="serif-title font-bold text-sm tracking-widest text-luxury-black uppercase">Gráfica de Componentes del Pago</h3>
+                            <p class="text-[11px] text-neutral-500">Distribución de capital amortizado, interés neto cobrado e IVA del periodo.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-3 text-[9px] font-extrabold uppercase tracking-widest">
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-[#0A0A0A]"></span>Abono K</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-[#C5B494]"></span>Interés</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded bg-[#EFECE6]"></span>IVA 15%</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-red-800"></span>Saldo</span>
+                        </div>
+                    </div>
+                    <div class="h-64 sm:h-72 w-full">
+                        <canvas id="luxury-amort-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- TABLA INTERACTIVA -->
+                <div class="bg-white rounded-2xl border border-luxury-beige/30 shadow-xs overflow-hidden">
+                    <div class="px-6 py-4 border-b border-luxury-lightBeige flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-luxury-cream/50">
+                        <div>
+                            <h3 class="serif-title font-bold text-xs tracking-widest text-luxury-black uppercase">
+                                Tabla de Pagos Desglosada
+                            </h3>
+                            <p class="text-[10px] text-neutral-500">Montos representados en dólares de curso legal en Ecuador.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="downloadCSVReport()" class="px-3.5 py-2 bg-white hover:bg-luxury-cream border border-luxury-beige/40 text-[10px] font-bold uppercase tracking-widest text-luxury-black rounded-lg transition-all flex items-center gap-1.5 shadow-xs">
+                                <i data-lucide="download" class="w-3.5 h-3.5"></i> Exportar CSV
+                            </button>
+                            <button onclick="window.print()" class="px-3.5 py-2 bg-white hover:bg-luxury-cream border border-luxury-beige/40 text-[10px] font-bold uppercase tracking-widest text-luxury-black rounded-lg transition-all flex items-center gap-1.5 shadow-xs">
+                                <i data-lucide="printer" class="w-3.5 h-3.5"></i> Imprimir
+                            </button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-luxury-cream text-luxury-darkBeige font-extrabold uppercase tracking-widest border-b border-luxury-beige/30 text-[9px]">
+                                    <th class="py-3 px-4 text-center">Nº</th>
+                                    <th class="py-3 px-4">Cuota Con IVA</th>
+                                    <th class="py-3 px-4">Capital Amortizado (K)</th>
+                                    <th class="py-3 px-4">Interés (I)</th>
+                                    <th class="py-3 px-4">IVA Interés</th>
+                                    <th class="py-3 px-4 text-right pr-6">Saldo Pendiente</th>
+                                </tr>
+                            </thead>
+                            <tbody id="interactive-schedule-body" class="divide-y divide-luxury-lightBeige font-medium text-luxury-black">
+                                <!-- Filas de la tabla generadas -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- COMPARADOR DE SISTEMAS EN TIEMPO REAL -->
+        <section id="comparador" class="mt-16 bg-white p-6 sm:p-8 rounded-2xl border border-luxury-beige/30 shadow-xs">
+            <h2 class="serif-title text-base font-bold text-luxury-black tracking-widest uppercase flex items-center gap-2">
+                <i data-lucide="arrow-left-right" class="text-luxury-darkBeige"></i>
+                Estudio Comparativo de Sistemas de Amortización
+            </h2>
+            <p class="text-[11px] text-neutral-500 mt-1 mb-8 max-w-3xl leading-relaxed">
+                ¿Cómo impacta cada sistema financiero tu cartera bajo las mismas condiciones de crédito? Analiza el costo real consolidado de cada uno de los métodos.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Modelo Francés -->
+                <div class="border border-luxury-beige/30 p-5 rounded-2xl bg-luxury-cream/30 hover:border-luxury-darkBeige transition-all flex flex-col justify-between">
+                    <div>
+                        <span class="text-[9px] font-extrabold text-white bg-luxury-black px-2.5 py-1 rounded-full uppercase tracking-widest">Sistema Francés</span>
+                        <h4 class="font-bold text-sm text-luxury-black mt-4">Cuotas Constantes</h4>
+                        <p class="text-[11px] text-neutral-500 mt-1.5 leading-relaxed">
+                            Es el sistema más utilizado para préstamos corporativos y de consumo. Pagarás siempre la misma cuota global periódica (con una mínima fluctuación decreciente por el IVA de interés).
+                        </p>
+                    </div>
+                    <div class="mt-6 border-t border-luxury-beige/20 pt-4 space-y-2 text-xs">
+                        <div class="flex justify-between text-neutral-600"><span>Primera Cuota:</span> <span id="comp-fr-cuota" class="font-bold text-luxury-black">$0.00</span></div>
+                        <div class="flex justify-between text-neutral-600"><span>Intereses Netos:</span> <span id="comp-fr-int" class="font-bold text-luxury-black">$0.00</span></div>
+                        <div class="flex justify-between text-neutral-600"><span>Aporte IVA:</span> <span id="comp-fr-iva" class="font-bold text-luxury-black">$0.00</span></div>
+                        <div class="flex justify-between pt-2 border-t border-luxury-beige/10 font-bold text-sm text-luxury-black">
+                            <span>Desembolso Total:</span> <span id="comp-fr-total" class="text-luxury-darkBeige">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modelo Alemán -->
+                <div class="border border-luxury-beige/30 p-5 rounded-2xl bg-luxury-cream/30 hover:border-luxury-darkBeige transition-all flex flex-col justify-between">
+                    <div>
+                        <span class="text-[9px] font-extrabold text-luxury-darkBeige bg-luxury-lightBeige px-2.5 py-1 rounded-full uppercase tracking-widest">Sistema Alemán</span>
+                        <h4 class="font-bold text-sm text-luxury-black mt-4">Amortización Constante</h4>
+                        <p class="text-[11px] text-neutral-500 mt-1.5 leading-relaxed">
+                            Frecuente para adquisición de bienes de capital e hipotecas. Se abona un valor de capital idéntico en cada cuota. Los pagos iniciales son elevados, disminuyendo progresivamente.
+                        </p>
+                    </div>
+                    <div class="mt-6 border-t border-luxury-beige/20 pt-4 space-y-2 text-xs">
+                        <div class="flex justify-between text-neutral-600"><span>Primera Cuota:</span> <span id="comp-al-cuota" class="font-bold text-luxury-black">$0.00</span></div>
+                        <div class="flex justify-between text-neutral-600"><span>Intereses Netos:</span> <span id="comp-al-int" class="font-bold text-luxury-black">$0.00</span></div>
+                        <div class="flex justify-between text-neutral-600"><span>Aporte IVA:</span> <span id="comp-al-iva" class="font-bold text-luxury-black">$0.00</span></div>
+                        <div class="flex justify-between pt-2 border-t border-luxury-beige/10 font-bold text-sm text-luxury-black">
+                            <span>Desembolso Total:</span> <span id="comp-al-total" class="text-luxury-darkBeige">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modelo Americano -->
+                <div class="border border-luxury-beige/30 p-5 rounded-2xl bg-luxury-cream/30 hover:border-luxury-darkBeige transition-all flex flex-col justify-between">
+                    <div>
+                        <span class="text-[9px] font-extrabold text-neutral-600 bg-neutral-200 px-2.5 py-1 rounded-full uppercase tracking-widest">Sistema Americano</span>
+                        <h4 class="font-bold text-sm text-luxury-black mt-4">Vencimiento del Principal</h4>
+                        <p class="text-[11px] text-neutral-500 mt-1.5 leading-relaxed">
+                            Habitual en inversiones financieras, colocación de títulos y bonos corporativos. Periódicamente solo se pagan intereses e IVA, y el 100% del capital es devuelto en la cuota de cierre.
+                        </p>
+                    </div>
+                    <div class="mt-6 border-t border-luxury-beige/20 pt-4 space-y-2 text-xs">
+                        <div class="flex justify-between text-neutral-600"><span>Cuotas 1 a N-1:</span> <span id="comp-am-cuota" class="font-bold text-luxury-black">$0.00</span></div>
+                        <div class="flex justify-between text-neutral-600"><span>Cuota Final:</span> <span id="comp-am-final" class="font-bold text-luxury-black">$0.00</span></div>
+                        <div class="flex justify-between text-neutral-600"><span>Aporte IVA:</span> <span id="comp-am-iva" class="font-bold text-luxury-black">$0.00</span></div>
+                        <div class="flex justify-between pt-2 border-t border-luxury-beige/10 font-bold text-sm text-luxury-black">
+                            <span>Desembolso Total:</span> <span id="comp-am-total" class="text-luxury-darkBeige">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEORÍA Y FÓRMULAS MATEMÁTICAS EN LA-TEX -->
+        <section id="teoria" class="mt-16 bg-luxury-black text-white p-6 sm:p-10 rounded-2xl border border-luxury-darkBeige/20 relative">
+            <div class="relative z-10 max-w-5xl">
+                <h2 class="serif-title text-base sm:text-lg font-bold tracking-widest text-luxury-beige uppercase mb-8 flex items-center gap-2">
+                    <i data-lucide="book-open"></i>
+                    Marco de Modelación y Fórmulas
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs sm:text-sm text-luxury-lightBeige/80 leading-relaxed">
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold text-luxury-beige uppercase tracking-widest text-xs mb-1.5">Conversión de Tasa de Interés Compuesto</h4>
+                            <p class="mb-2">
+                                Para evaluar el interés compuesto financiero de forma exacta sin incurrir en errores de simple división lineal, se utiliza la ecuación exponencial de equivalencia de tasas:
+                            </p>
+                            <div class="bg-luxury-charcoal p-3 rounded-lg text-luxury-cream text-center my-3 font-mono border border-luxury-darkBeige/10">
+                                $$TEM = (1 + TEA)^{\frac{1}{12}} - 1$$
+                            </div>
+                            <p class="text-[11px] text-neutral-400">
+                                Donde $TEA$ representa la Tasa Efectiva Anual y $TEM$ es la Tasa Efectiva Mensual que rige las liquidaciones de cuota.
+                            </p>
+                        </div>
+
+                        <div>
+                            <h4 class="font-bold text-luxury-beige uppercase tracking-widest text-xs mb-1.5">Efecto Impositivo (IVA de Ecuador)</h4>
+                            <p>
+                                El Impuesto al Valor Agregado ($IVA$) no grava la amortización de capital, sino únicamente el interés devengado en cada período:
+                            </p>
+                            <div class="bg-luxury-charcoal p-3 rounded-lg text-luxury-cream text-center my-3 font-mono border border-luxury-darkBeige/10">
+                                $$IVA_{periodo} = Inter\acute{e}s_{periodo} \times 15\%$$
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="font-bold text-luxury-beige uppercase tracking-widest text-xs mb-1.5">Modelos de Cálculo por Sistema</h4>
+                            <ul class="space-y-4">
+                                <li>
+                                    <strong>Francés (Cuota Fija):</strong> 
+                                    La cuota base se calcula usando una anualidad vencida ordinaria:
+                                    <div class="bg-luxury-charcoal p-2.5 rounded-lg text-luxury-cream text-center my-2 font-mono border border-luxury-darkBeige/10">
+                                        $$Cuota = P \times \frac{r \times (1+r)^n}{(1+r)^n - 1}$$
+                                    </div>
+                                </li>
+                                <li>
+                                    <strong>Alemán (Amortización Fija):</strong>
+                                    El abono a capital del periodo es una constante perfecta:
+                                    <div class="bg-luxury-charcoal p-2.5 rounded-lg text-luxury-cream text-center my-2 font-mono border border-luxury-darkBeige/10">
+                                        $$Amortizaci\acute{o}n = \frac{P}{n}$$
+                                    </div>
+                                </li>
+                                <li>
+                                    <strong>Americano (Capital al Vencimiento):</strong>
+                                    Amortización nula en todos los períodos excepto el cierre:
+                                    <div class="bg-luxury-charcoal p-2.5 rounded-lg text-luxury-cream text-center my-2 font-mono border border-luxury-darkBeige/10">
+                                        $$Amortizaci\acute{o}n_t = 0 \quad (\forall t < n), \quad Amortizaci\acute{o}n_n = P$$
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-luxury-black text-luxury-lightBeige/50 border-t border-luxury-darkBeige/20 py-8 text-xs no-print">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="serif-title font-bold text-sm tracking-widest text-white">ECUAMORTIZA ELITE</span>
+            </div>
+            <p>© 2026 EcuAmortiza. Todos los derechos reservados. Desarrollado de acuerdo con la Ley de Régimen Tributario Interno del Ecuador.</p>
+        </div>
+    </footer>
+
+    <!-- LÓGICA FINANCIERA JAVASCRIPT -->
+    <script>
+        // Inicialización de Iconos de Lucide
+        lucide.createIcons();
+
+        // Control de estado de la aplicación
+        let currentTasaMode = 'anual';
+        let customChartInstance = null;
+        let generatedDataset = [];
+
+        // Elementos de formulario
+        const inpCapital = document.getElementById('capital');
+        const inpTasa = document.getElementById('tasa-entrada');
+        const chkCompuesto = document.getElementById('interes-compuesto-chk');
+        const inpPlazo = document.getElementById('plazo');
+        const selectPlazoUnidad = document.getElementById('plazo-unidad');
+        const selectSistema = document.getElementById('sistema-tipo');
+        const inpIva = document.getElementById('iva-rango');
+
+        // Función para mostrar Toast personalizado de Éxito
+        function showCustomToast(text) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-text').innerText = text;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // Alternar el tipo de Tasa (Anual o Mensual)
+        function updateTasaMode(mode) {
+            currentTasaMode = mode;
+            const btnAnual = document.getElementById('toggle-tasa-anual');
+            const btnMensual = document.getElementById('toggle-tasa-mensual');
+            const suffix = document.getElementById('tasa-suffix');
+
+            if (mode === 'anual') {
+                btnAnual.className = 'px-2 py-1 rounded bg-white text-luxury-black shadow-xs transition-all';
+                btnMensual.className = 'px-2 py-1 text-neutral-500 transition-all';
+                suffix.innerText = '% Anual';
+                if (parseFloat(inpTasa.value) < 2) {
+                    inpTasa.value = (parseFloat(inpTasa.value) * 12).toFixed(2);
+                }
+            } else {
+                btnMensual.className = 'px-2 py-1 rounded bg-white text-luxury-black shadow-xs transition-all';
+                btnAnual.className = 'px-2 py-1 text-neutral-500 transition-all';
+                suffix.innerText = '% Mensual';
+                if (parseFloat(inpTasa.value) > 5) {
+                    inpTasa.value = (parseFloat(inpTasa.value) / 12).toFixed(2);
+                }
+            }
+            updateRatesDisplays();
+            triggerCalculation();
+        }
+
+        // Realizar conversión técnica de intereses
+        function convertInterestRates() {
+            const rawTasa = parseFloat(inpTasa.value) || 0;
+            const compoundActive = chkCompuesto.checked;
+            let tea = 0;
+            let tem = 0;
+
+            if (currentTasaMode === 'anual') {
+                tea = rawTasa;
+                if (compoundActive) {
+                    // Compuesto: TEM = (1 + TEA)^(1/12) - 1
+                    tem = (Math.pow(1 + (tea / 100), 1 / 12) - 1) * 100;
+                } else {
+                    // Simple: TEM = TEA / 12
+                    tem = tea / 12;
+                }
+            } else {
+                tem = rawTasa;
+                if (compoundActive) {
+                    // Compuesto: TEA = (1 + TEM)^12 - 1
+                    tea = (Math.pow(1 + (tem / 100), 12) - 1) * 100;
+                } else {
+                    // Simple: TEA = TEM * 12
+                    tea = tem * 12;
+                }
+            }
+
+            return {
+                tea: tea / 100,
+                tem: tem / 100
+            };
+        }
+
+        // Actualizar visualizaciones de la tasa en pantalla
+        function updateRatesDisplays() {
+            const rates = convertInterestRates();
+            document.getElementById('display-tea').innerText = (rates.tea * 100).toFixed(4) + '%';
+            document.getElementById('display-tem').innerText = (rates.tem * 100).toFixed(4) + '%';
+        }
+
+        // Formatear Moneda a USD
+        function formatUSD(val) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD'
+            }).format(val);
+        }
+
+        // Construir tabla de amortización por sistema
+        function buildSchedule(P, r, n, sistema, ivaRate) {
+            const schedule = [];
+            let balance = P;
+
+            if (sistema === 'francesa') {
+                // Cuota base constante: C = P * (r * (1+r)^n) / ((1+r)^n - 1)
+                const cuotaBase = P * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+
+                for (let i = 1; i <= n; i++) {
+                    const interes = balance * r;
+                    const iva = interes * ivaRate;
+                    const amortizacion = cuotaBase - interes;
+                    const cuotaConIva = cuotaBase + iva;
+                    balance = balance - amortizacion;
+
+                    schedule.push({
+                        periodo: i,
+                        cuotaConIva: cuotaConIva,
+                        amortizacion: amortizacion,
+                        interes: interes,
+                        iva: iva,
+                        saldo: Math.max(0, balance)
+                    });
+                }
+            } else if (sistema === 'alemana') {
+                // Amortización fija: K = P / n
+                const amortizacion = P / n;
+
+                for (let i = 1; i <= n; i++) {
+                    const interes = balance * r;
+                    const iva = interes * ivaRate;
+                    const cuotaConIva = amortizacion + interes + iva;
+                    balance = balance - amortizacion;
+
+                    schedule.push({
+                        periodo: i,
+                        cuotaConIva: cuotaConIva,
+                        amortizacion: amortizacion,
+                        interes: interes,
+                        iva: iva,
+                        saldo: Math.max(0, balance)
+                    });
+                }
+            } else if (sistema === 'americana') {
+                // Intereses periódicos y devolución de capital en periodo N
+                for (let i = 1; i <= n; i++) {
+                    const interes = balance * r;
+                    const iva = interes * ivaRate;
+                    const amortizacion = (i === n) ? P : 0;
+                    const cuotaConIva = amortizacion + interes + iva;
+                    if (i === n) balance = 0;
+
+                    schedule.push({
+                        periodo: i,
+                        cuotaConIva: cuotaConIva,
+                        amortizacion: amortizacion,
+                        interes: interes,
+                        iva: iva,
+                        saldo: balance
+                    });
+                }
+            }
+
+            return schedule;
+        }
+
+        // Renderizar el Dashboard principal
+        function renderLuxuryDashboard(schedule, P, r, n, ivaRate) {
+            const tbody = document.getElementById('interactive-schedule-body');
+            tbody.innerHTML = '';
+
+            let totalInteres = 0;
+            let totalIva = 0;
+            let totalPagado = 0;
+
+            const labels = [];
+            const kAmort = [];
+            const iNet = [];
+            const ivaTax = [];
+            const rBalance = [];
+
+            schedule.forEach(row => {
+                totalInteres += row.interes;
+                totalIva += row.iva;
+                totalPagado += row.cuotaConIva;
+
+                labels.push(`P${row.periodo}`);
+                kAmort.push(row.amortizacion.toFixed(2));
+                iNet.push(row.interes.toFixed(2));
+                ivaTax.push(row.iva.toFixed(2));
+                rBalance.push(row.saldo.toFixed(2));
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-luxury-cream transition-colors border-b border-luxury-lightBeige";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-bold text-neutral-400">${row.periodo}</td>
+                    <td class="py-3 px-4 font-black text-luxury-black">${formatUSD(row.cuotaConIva)}</td>
+                    <td class="py-3 px-4 text-luxury-black">${formatUSD(row.amortizacion)}</td>
+                    <td class="py-3 px-4 text-luxury-darkBeige font-semibold">${formatUSD(row.interes)}</td>
+                    <td class="py-3 px-4 text-neutral-500">${formatUSD(row.iva)}</td>
+                    <td class="py-3 px-4 text-right pr-6 text-neutral-400 font-mono">${formatUSD(row.saldo)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Actualizar tarjetas de KPI
+            document.getElementById('kpi-primera-cuota').innerText = formatUSD(schedule[0].cuotaConIva);
+            document.getElementById('kpi-total-interes').innerText = formatUSD(totalInteres);
+            document.getElementById('kpi-total-iva').innerText = formatUSD(totalIva);
+            document.getElementById('kpi-total-pagado').innerText = formatUSD(totalPagado);
+
+            // Pintar gráfica con colores sofisticados (Negro, Beige y Crema)
+            drawChart(labels, kAmort, iNet, ivaTax, rBalance);
+        }
+
+        // Dibujar gráfico con colores del estilo
+        function drawChart(labels, amort, int, iva, saldo) {
+            const ctx = document.getElementById('luxury-amort-chart').getContext('2d');
+
+            if (customChartInstance) {
+                customChartInstance.destroy();
+            }
+
+            customChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Saldo Restante',
+                            data: saldo,
+                            type: 'line',
+                            borderColor: '#8C7A5B',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#0A0A0A',
+                            fill: false,
+                            yAxisID: 'yS'
+                        },
+                        {
+                            label: 'Amortización K',
+                            data: amort,
+                            backgroundColor: '#0A0A0A',
+                            stack: 'cuota',
+                            yAxisID: 'yC'
+                        },
+                        {
+                            label: 'Interés Neto',
+                            data: int,
+                            backgroundColor: '#C5B494',
+                            stack: 'cuota',
+                            yAxisID: 'yC'
+                        },
+                        {
+                            label: 'IVA (15%)',
+                            data: iva,
+                            backgroundColor: '#EFECE6',
+                            stack: 'cuota',
+                            yAxisID: 'yC'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        yC: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: '#EFECE6' },
+                            ticks: { font: { size: 9 } }
+                        },
+                        yS: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { drawOnChartArea: false },
+                            ticks: { font: { size: 9 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+
+        // Correr el comparador silencioso de los 3 sistemas
+        function runSilentComparador(P, r, n, ivaRate) {
+            // Francés
+            const sFr = buildSchedule(P, r, n, 'francesa', ivaRate);
+            let intFr = 0, ivaFr = 0, pagFr = 0;
+            sFr.forEach(row => { intFr += row.interes; ivaFr += row.iva; pagFr += row.cuotaConIva; });
+            document.getElementById('comp-fr-cuota').innerText = formatUSD(sFr[0].cuotaConIva);
+            document.getElementById('comp-fr-int').innerText = formatUSD(intFr);
+            document.getElementById('comp-fr-iva').innerText = formatUSD(ivaFr);
+            document.getElementById('comp-fr-total').innerText = formatUSD(pagFr);
+
+            // Alemán
+            const sAl = buildSchedule(P, r, n, 'alemana', ivaRate);
+            let intAl = 0, ivaAl = 0, pagAl = 0;
+            sAl.forEach(row => { intAl += row.interes; ivaAl += row.iva; pagAl += row.cuotaConIva; });
+            document.getElementById('comp-al-cuota').innerText = formatUSD(sAl[0].cuotaConIva);
+            document.getElementById('comp-al-int').innerText = formatUSD(intAl);
+            document.getElementById('comp-al-iva').innerText = formatUSD(ivaAl);
+            document.getElementById('comp-al-total').innerText = formatUSD(pagAl);
+
+            // Americano
+            const sAm = buildSchedule(P, r, n, 'americana', ivaRate);
+            let intAm = 0, ivaAm = 0, pagAm = 0;
+            sAm.forEach(row => { intAm += row.interes; ivaAm += row.iva; pagAm += row.cuotaConIva; });
+            document.getElementById('comp-am-cuota').innerText = formatUSD(sAm[0].cuotaConIva);
+            document.getElementById('comp-am-final').innerText = formatUSD(sAm[n-1].cuotaConIva);
+            document.getElementById('comp-am-iva').innerText = formatUSD(ivaAm);
+            document.getElementById('comp-am-total').innerText = formatUSD(pagAm);
+        }
+
+        // Ejecutar los cálculos
+        function triggerCalculation() {
+            const P = parseFloat(inpCapital.value) || 0;
+            const rates = convertInterestRates();
+            const r = rates.tem;
+
+            let n = parseInt(inpPlazo.value) || 0;
+            if (selectPlazoUnidad.value === 'anios') {
+                n = n * 12;
+            }
+
+            const sistema = selectSistema.value;
+            const ivaRate = (parseFloat(inpIva.value) || 0) / 100;
+
+            if (P <= 0 || r <= 0 || n <= 0) {
+                return;
+            }
+
+            generatedDataset = buildSchedule(P, r, n, sistema, ivaRate);
+            renderLuxuryDashboard(generatedDataset, P, r, n, ivaRate);
+            runSilentComparador(P, r, n, ivaRate);
+            showCustomToast("Simulación financiera generada");
+        }
+
+        // Descarga de reporte en formato compatible con Excel
+        function downloadCSVReport() {
+            if (!generatedDataset || generatedDataset.length === 0) return;
+
+            let csv = "Periodo,Cuota con IVA,Capital Amortizado,Interes Neto,IVA (15%),Saldo Pendiente\r\n";
+            generatedDataset.forEach(row => {
+                csv += `${row.periodo},${row.cuotaConIva.toFixed(2)},${row.amortizacion.toFixed(2)},${row.interes.toFixed(2)},${row.iva.toFixed(2)},${row.saldo.toFixed(2)}\r\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Plan_Pagos_Elite_${selectSistema.value}_${inpCapital.value}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showCustomToast("Plan de pagos descargado");
+        }
+
+        // Escuchar inputs para recargar datos en vivo
+        [inpCapital, inpTasa, chkCompuesto, inpPlazo, selectPlazoUnidad, selectSistema, inpIva].forEach(inp => {
+            inp.addEventListener('input', () => {
+                updateRatesDisplays();
+                document.getElementById('live-monto-label').innerText = formatUSD(parseFloat(inpCapital.value) || 0);
+            });
+        });
+
+        // Inicialización en carga de pantalla
+        window.onload = function() {
+            updateRatesDisplays();
+            triggerCalculation();
+        }
+    </script>
+</body>
+</html>
